@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  favoriteIds   String[]  @db.ObjectId
+
+  accounts     Account[]     @relation("UserToAccount")
+  listings     Listing[]     @relation("UserToListing")
+  reservations Reservation[] @relation("UserToReservation")
+}
+
+model Account {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String  @db.ObjectId
+  type         String
+  provider     String
+  providerId   String
+  refreshToken String? @db.String
+  accessToken  String? @db.String
+  expiresAt    Int?
+  tokenType    String?
+  scope        String?
+  idToken      String? @db.String
+  sessionState String?
+
+  user User @relation("UserToAccount", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerId])
+}
+
+model Listing {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String        @db.ObjectId
+  title         String
+  description   String
+  image         String
+  createAt      DateTime      @default(now())
+  category      String
+  roomCount     Int
+  bathroomCount Int
+  guestCount    Int
+  type          String
+  address       String
+  price         Int
+  reservations  Reservation[] @relation("ListingToReservation")
+
+  user User @relation("UserToListing", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Reservation {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String   @db.ObjectId
+  listingId       String   @db.ObjectId
+  checkIn         DateTime
+  checkOut        DateTime
+  totalPrice      Int
+  createAt        DateTime @default(now())
+  paymentIntentId String
+  paymentMethodId String
+  status          String
+
+  user    User    @relation("UserToReservation", fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation("ListingToReservation", fields: [listingId], references: [id], onDelete: Cascade)
+}
