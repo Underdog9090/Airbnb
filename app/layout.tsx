@@ -7,14 +7,15 @@ import ClientOnly from "./components/ClientOnly";
 import RegisterModal from "./components/modals/RegisterModal";
 import ToasterProvider from "./providers/ToasterProvider";
 import LogInModal from "./components/modals/LogInModal";
-
-
-
+import getCurrentUser from "./actions/currentUser";
+import Providers from "./providers";
+import RentModal from "./components/modals/RentModal";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
 });
+
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
@@ -27,26 +28,33 @@ export const metadata: Metadata = {
 };
 
 const font = Nunito({
-  subsets: ["latin",],
+  subsets: ["latin"],
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const currentUser = await getCurrentUser(); // Fetch the current user--> its not fetchin no idea y!
+  
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${font.className} antialiased`}>
-        <ClientOnly>
+          <Providers>
+
+        {/* <ClientOnly> */}
           <ToasterProvider />
           <RegisterModal />
+          <RentModal />
           <LogInModal />
-          <Navbar />
-        </ClientOnly>
+          <Navbar currentUser={currentUser} /> {/* Pass currentUser here */}
+        {/* </ClientOnly> */}
 
         {children}
+          </Providers>
       </body>
     </html>
   );

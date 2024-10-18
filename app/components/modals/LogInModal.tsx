@@ -12,6 +12,7 @@ import Button from "../Button";
 import useLogInModal from "../../hooks/userLogInModel";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { log } from "console";
 
 const LogInModal = () => {
   const registerModal = useRegisterModal();
@@ -60,6 +61,11 @@ const LogInModal = () => {
     [logInModal, router]
   );
 
+    const toggle = useCallback(() => {
+        logInModal.onClose();
+        registerModal.onOpen();
+    }, [logInModal, registerModal]); 
+
   const bodyContent = (
     <div className="flex flex-col">
       <Heading title="Welcome to black" subtitle=" Log in to your Account " />
@@ -103,9 +109,9 @@ const LogInModal = () => {
           Don't have an account?{" "}
           <span
             className="text-indigo-500 cursor-pointer"
-            onClick={registerModal.onOpen}
+            onClick={toggle}
           >
-            Sign up
+            Create an account
           </span>
         </div>
       </div>
