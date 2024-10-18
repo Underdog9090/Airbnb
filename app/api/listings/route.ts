@@ -22,7 +22,6 @@ export async function POST(req: Request) {
     price,
     title,
     description,
-    // type, // Ensure this is included
   } = body;
 
   const requiredFields = ["category", "address", "guestCount", "roomCount", "bathroomCount", "image", "price", "title", "description",]; //todo: ADD back type
@@ -44,7 +43,6 @@ export async function POST(req: Request) {
         guestCount,
         address,
         image,
-        // type, // Include the type field here
         user: {
           connect: {
             id: user.id,

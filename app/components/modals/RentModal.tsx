@@ -228,20 +228,51 @@ const RentModal = () => {
   }
 
   if (step === STEPS.PRICE) {
+
+    const currencies = [
+      { label: "SEK", value: "SEK" },
+      { label: "USD", value: "USD" },
+      { label: "EUR", value: "EUR" },
+      // Add more currencies as needed
+    ];
+    
+
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading title="Price" subtitle="Set the price for your property" />
-        <input
-          id="price"
-          type="number"
-          placeholder="Price"
-          {...register("price", { required: "Price is required" })}
+        
+        {/* Currency Selector */}
+        <select
+          {...register("currency", { required: "Currency is required" })}
           disabled={isLoading}
-        />
+          className="input"
+        >
+          {currencies.map((currency) => (
+            <option key={currency.value} value={currency.value}>
+              {currency.label}
+            </option>
+          ))}
+        </select>
+        
+        <div className="flex items-center gap-2">
+          <input
+            id="price"
+            type="number"
+            placeholder="Price"
+            {...register("price", { required: "Price is required" })}
+            disabled={isLoading}
+            className="input"
+          />
+          {/* Display currency symbol next to price input */}
+          <span className="currency-symbol">{watch("currency")}</span>
+        </div>
+        
         {errors.price?.message && <p className="error-message">{String(errors.price.message)}</p>}
+        {errors.currency?.message && <p className="error-message">{String(errors.currency.message)}</p>}
       </div>
     );
   }
+  
 
   return (
     <Modal
@@ -253,7 +284,7 @@ const RentModal = () => {
       secondaryAction={step === STEPS.CATEGORY ? undefined : onBack}
       title="Airbnb your home"
       body={bodyContent}
-      
+      footer
     />
   );
 };

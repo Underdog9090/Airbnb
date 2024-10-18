@@ -37,24 +37,30 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const currentUser = await getCurrentUser(); // Fetch the current user--> its not fetchin no idea y!
-  
 
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${font.className} antialiased`}>
-          <Providers>
+        className={`${geistSans.variable} ${geistMono.variable} ${font.className} antialiased`}
+      >
+        <Providers>
+          <ClientOnly>
+            <ToasterProvider />
+            <RegisterModal />
+            <RentModal />
+            <LogInModal />
+            <Navbar currentUser={currentUser} /> {/* Pass currentUser here */}
+          </ClientOnly>
+          <div
+            className="
+          pb-20
+          pt-28
 
-        {/* <ClientOnly> */}
-          <ToasterProvider />
-          <RegisterModal />
-          <RentModal />
-          <LogInModal />
-          <Navbar currentUser={currentUser} /> {/* Pass currentUser here */}
-        {/* </ClientOnly> */}
-
-        {children}
-          </Providers>
+          "
+          >
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   );
