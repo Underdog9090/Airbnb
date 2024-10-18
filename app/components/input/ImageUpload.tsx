@@ -63,7 +63,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onChange, value }) => {
               text-neutral-600
             "
           >
-            <TbPhotoPlus size={32} />
+            <TbPhotoPlus size={100} />
             <div
               className="text-center
               font-bold
