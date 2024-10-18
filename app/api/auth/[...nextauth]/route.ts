@@ -73,3 +73,6 @@ const handler = NextAuth(authOptions);
 
 // Named exports for HTTP methods
 export { handler as GET, handler as POST };
+
+// const Auth = NextAuth(authOptions);
+// export default Auth;

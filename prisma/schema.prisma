@@ -53,8 +53,7 @@ model Listing {
   roomCount     Int
   bathroomCount Int
   guestCount    Int
-  type          String
-  address       String
+  address       Json
   price         Int
   reservations  Reservation[] @relation("ListingToReservation")
 
