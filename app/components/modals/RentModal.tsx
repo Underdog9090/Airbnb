@@ -1,5 +1,5 @@
 "use client";
-import Modal from "./Modal";
+import Modal from "./Modal"; // Adjust path as necessary
 import { useState, useCallback, useMemo } from "react";
 import useRentModal from "../../hooks/useRentModal";
 import Heading from "../Heading";
@@ -7,14 +7,14 @@ import { categories } from "../navbar/Categories";
 import CategoryInput from "../../components/input/CategoryInput";
 import { useForm, FieldValues, SubmitHandler } from "react-hook-form";
 import CountrySelect, { CountrySelectValue } from "../input/CountrySelect";
-import dynamic from "next/dynamic";
+import dynamic from "next/dynamic"; // Remove this if Map is already imported
 import Counter from "../Counter";
 import ImageUpload from "../input/ImageUpload";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import L from "leaflet";
+import Map from "../Map"; // Adjust path as necessary
 
 enum STEPS {
   CATEGORY = 0,
@@ -32,6 +32,7 @@ const RentModal = () => {
   const [step, setStep] = useState(STEPS.CATEGORY);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [center, setCenter] = useState<CountrySelectValue | null>(null);
+  const [position, setPosition] = useState<L.LatLngExpression | undefined>(undefined); // For map position
 
   const {
     register,
@@ -62,8 +63,6 @@ const RentModal = () => {
   const bathroomCount = watch("bathroomCount");
   const imageSrc = watch("image");
 
-  const Map = useMemo(() => dynamic(() => import("../Map"), { ssr: false }), [location]);
-
   const setCustomValue = useCallback(
     (name: string, value: any) => {
       setValue(name, value, {
@@ -78,8 +77,8 @@ const RentModal = () => {
   // Handle category selection
   const handleCategorySelect = useCallback(
     (categoryLabel: string) => {
-      setCustomValue("category", categoryLabel); // Set category in the form
-      setSelectedCategory(categoryLabel); // Update local state for UI
+      setCustomValue("category", categoryLabel);
+      setSelectedCategory(categoryLabel);
     },
     [setCustomValue]
   );
@@ -113,7 +112,7 @@ const RentModal = () => {
     setIsLoading(true);
 
     axios
-      .post("/api/listings", data)
+      .post("/api/listings", { ...data, position }) // Include position in the submitted data
       .then(() => {
         toast.success("Property published successfully!");
         router.refresh();
@@ -158,23 +157,19 @@ const RentModal = () => {
           value={center}
           onChange={(value) => {
             setCenter(value);
-            setCustomValue("address", value);
+            setCustomValue("address", value); // Sync selected country with address
           }}
         />
         <Map
-          center={center?.latlng as L.LatLngExpression || [51.505, -0.09]}
-          position={location?.latlng as L.LatLngExpression}
-          setPosition={(position) => {
-            const _address = watch("address");
-            if (_address) {
-              _address.latlng = position;
-              setCustomValue("address", _address);
-            }
-          }}
+          center={center?.latlng as L.LatLngExpression | undefined}
+          position={position} // Pass the current position
+          setPosition={setPosition} // Set the position based on user interaction
         />
       </div>
     );
   }
+
+  // The rest of the steps remain the same...
 
   if (step === STEPS.DETAILS) {
     bodyContent = (
@@ -228,19 +223,17 @@ const RentModal = () => {
   }
 
   if (step === STEPS.PRICE) {
-
     const currencies = [
       { label: "SEK", value: "SEK" },
       { label: "USD", value: "USD" },
       { label: "EUR", value: "EUR" },
       // Add more currencies as needed
     ];
-    
 
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading title="Price" subtitle="Set the price for your property" />
-        
+
         {/* Currency Selector */}
         <select
           {...register("currency", { required: "Currency is required" })}
@@ -253,7 +246,7 @@ const RentModal = () => {
             </option>
           ))}
         </select>
-        
+
         <div className="flex items-center gap-2">
           <input
             id="price"
@@ -266,25 +259,28 @@ const RentModal = () => {
           {/* Display currency symbol next to price input */}
           <span className="currency-symbol">{watch("currency")}</span>
         </div>
-        
+
         {errors.price?.message && <p className="error-message">{String(errors.price.message)}</p>}
         {errors.currency?.message && <p className="error-message">{String(errors.currency.message)}</p>}
       </div>
     );
   }
-  
 
   return (
     <Modal
       isOpen={rentModal.isOpen}
       onClose={rentModal.onClose}
       onSubmit={handleSubmit(onSubmit)}
+      title="Rent your Property"
+      body={bodyContent}
       actionLabel={actionLabel}
       secondaryActionLabel={secondaryLabel}
-      secondaryAction={step === STEPS.CATEGORY ? undefined : onBack}
-      title="Airbnb your home"
-      body={bodyContent}
-      footer
+      secondaryAction={onBack}
+      footer={
+        <div className="text-neutral-500 text-sm">
+          Step {step + 1} of {Object.keys(STEPS).length}
+        </div>
+      }
     />
   );
 };

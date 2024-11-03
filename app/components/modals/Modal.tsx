@@ -17,58 +17,58 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({
-    isOpen,
-    onClose,
-    onSubmit,
-    title,
-    body,
-    footer,
-    actionLabel,
-    disabled,
-    secondaryAction,
-    secondaryActionLabel,
-  }) => {
-    const [showModal, setShowModal] = useState(isOpen);
-  
-    useEffect(() => {
-      setShowModal(isOpen);
-    }, [isOpen]);
-  
-    const handleClose = useCallback(() => {
-      if (disabled) {
-        return;
-      }
-  
-      setShowModal(false);
-      setTimeout(() => {
-        onClose();
-      }, 300);
-    }, [disabled, onClose]);
-  
-    const handleSubmit = useCallback(() => {
-      if (disabled) {
-        return;
-      }
-  
-      onSubmit();
-    }, [disabled, onSubmit]);
-  
-    const handleSecondaryAction = useCallback(() => {
-      if (disabled || !secondaryAction) {
-        return;
-      }
-  
-      secondaryAction();
-    }, [disabled, secondaryAction]);
-  
-    if (!isOpen) {
-      return null;
+  isOpen,
+  onClose,
+  onSubmit,
+  title,
+  body,
+  footer,
+  actionLabel,
+  disabled,
+  secondaryAction,
+  secondaryActionLabel,
+}) => {
+  const [showModal, setShowModal] = useState(isOpen);
+
+  useEffect(() => {
+    setShowModal(isOpen);
+  }, [isOpen]);
+
+  const handleClose = useCallback(() => {
+    if (disabled) {
+      return;
     }
-  
-    return (
-      <>
-        <div
-          className="
+
+    setShowModal(false);
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  }, [disabled, onClose]);
+
+  const handleSubmit = useCallback(() => {
+    if (disabled) {
+      return;
+    }
+
+    onSubmit();
+  }, [disabled, onSubmit]);
+
+  const handleSecondaryAction = useCallback(() => {
+    if (disabled || !secondaryAction) {
+      return;
+    }
+
+    secondaryAction();
+  }, [disabled, secondaryAction]);
+
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <>
+      <div
+        className="
             justify-center
             items-center
             flex
@@ -81,9 +81,9 @@ const Modal: React.FC<ModalProps> = ({
             focus:outline-none
             bg-neutral-800/70
           "
-        >
-          <div
-            className="
+      >
+        <div
+          className="
               relative
               w-full
               md:w-4/6
@@ -95,19 +95,19 @@ const Modal: React.FC<ModalProps> = ({
               lg:h-auto
               md:h-auto
             "
-          >
-            {/* Content */}
-            <div
-              className={`
+        >
+          {/* Content */}
+          <div
+            className={`
                 translate
                 duration-300 
                 h-full 
                 ${showModal ? "translate-y-0" : "translate-y-full"}
                 ${showModal ? "opacity-100" : "opacity-0"}
               `}
-            >
-              <div
-                className="
+          >
+            <div
+              className="
                   translate
                   h-full
                   lg:h-auto
@@ -123,10 +123,10 @@ const Modal: React.FC<ModalProps> = ({
                   outline-none
                   focus:outline-none
                 "
-              >
-                {/* Header */}
-                <div
-                  className="
+            >
+              {/* Header */}
+              <div
+                className="
                     flex
                     items-center
                     p-4
@@ -135,10 +135,10 @@ const Modal: React.FC<ModalProps> = ({
                     relative
                     border-b-[1px]
                   "
-                >
-                  <button
-                    onClick={handleClose}
-                    className="
+              >
+                <button
+                  onClick={handleClose}
+                  className="
                       p-1
                       border-0
                       hover:opacity-70
@@ -146,20 +146,20 @@ const Modal: React.FC<ModalProps> = ({
                       absolute
                       left-4
                     "
-                  >
-                    <IoMdClose size={16} />
-                  </button>
-  
-                  {/* Centered Title */}
-                  <div className="text-md font-semibold">{title}</div>
-                </div>
-  
-                {/* Body */}
-                <div className="relative p-4 text-sm">{body}</div>
-  
-                {/* Action Buttons (Submit and Secondary) */}
-                <div
-                  className="
+                >
+                  <IoMdClose size={16} />
+                </button>
+
+                {/* Centered Title */}
+                <div className="text-md font-semibold">{title}</div>
+              </div>
+
+              {/* Body */}
+              <div className="relative p-4 text-sm">{body}</div>
+
+              {/* Action Buttons (Submit and Secondary) */}
+              <div
+                className="
                     flex
                     flex-row
                     items-center
@@ -167,33 +167,33 @@ const Modal: React.FC<ModalProps> = ({
                     w-full
                     px-4 pb-4
                   "
-                >
-                  {secondaryAction && secondaryActionLabel && (
-                    <Button
-                      outline
-                      disabled={disabled}
-                      label={secondaryActionLabel}
-                      onClick={handleSecondaryAction}
-                      small
-                    />
-                  )}
-  
+              >
+                {secondaryAction && secondaryActionLabel && (
                   <Button
+                    outline
                     disabled={disabled}
-                    label={actionLabel}
-                    onClick={handleSubmit}
+                    label={secondaryActionLabel}
+                    onClick={handleSecondaryAction}
                     small
                   />
-                </div>
-  
-                {/* Footer (appears after the submit button now) */}
-                <div className="flex flex-col gap-2 mt-3 px-4 pb-4">{footer}</div>
+                )}
+
+                <Button
+                  disabled={disabled}
+                  label={actionLabel}
+                  onClick={handleSubmit}
+                  small
+                />
               </div>
+
+              {/* Footer (appears after the submit button now) */}
+              <div className="flex flex-col gap-2 mt-3 px-4 pb-4">{footer}</div>
             </div>
           </div>
         </div>
-      </>
-    );
-  };
-  
+      </div>
+    </>
+  );
+};
+
 export default Modal;

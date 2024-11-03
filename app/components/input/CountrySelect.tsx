@@ -1,5 +1,4 @@
 "use client";
-
 import Select from "react-select";
 import useCountries from "../../hooks/useCountries";
 
@@ -17,28 +16,24 @@ interface CountrySelectProps {
 }
 
 const CountrySelect: React.FC<CountrySelectProps> = ({ value, onChange }) => {
-  const getAll = useCountries();
+  const { getAllCountries } = useCountries();
 
   return (
-    <div>
-      <Select
-        placeholder="Select a country"
-        isClearable
-        options={getAll.getAllCountries()}
-        value={value}
-        onChange={(value) => onChange(value as CountrySelectValue)}
-        formatOptionLabel={(option: any) => (
-          <div className="flex flex-row items-center gap-3">
-            <div>{option.flag}</div>
-            <div>
-              {option.label}
-              <span className="text-neutral-800 ml-1">({option.region})</span>
-            </div>
-          </div>
-        )}
-        classNamePrefix="custom-select" // Added for custom CSS styling
-      />
-    </div>
+    <Select
+      placeholder="Select a country"
+      isClearable
+      options={getAllCountries()}
+      value={value}
+      onChange={(option) => onChange(option as CountrySelectValue)}
+      formatOptionLabel={(option: CountrySelectValue) => (
+        <div className="flex items-center gap-3">
+          <span>{option.flag}</span>
+          <span>{option.label}</span>
+          <span className="text-neutral-600 ml-1">({option.region})</span>
+        </div>
+      )}
+      classNamePrefix="custom-select"
+    />
   );
 };
 
