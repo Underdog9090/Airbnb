@@ -68,9 +68,9 @@ model Reservation {
   checkOut        DateTime
   totalPrice      Int
   createAt        DateTime @default(now())
-  paymentIntentId String
-  paymentMethodId String
-  status          String
+  paymentIntentId String?
+  paymentMethodId String?
+  status          String?
 
   user    User    @relation("UserToReservation", fields: [userId], references: [id], onDelete: Cascade)
   listing Listing @relation("ListingToReservation", fields: [listingId], references: [id], onDelete: Cascade)

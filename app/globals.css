@@ -32,3 +32,62 @@ body {
 .leaflet-top {
   z-index: 0 !important;
 }
+.rdrMonth{
+  width: 100% !important;
+}
+
+.rdCalendarWrapper{
+  width: 100% !important;
+  font-size: 16px !important;
+}
+
+
+.calendar-container {
+  padding: 1rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.custom-calendar .rdrMonthAndYearWrapper {
+  padding: 0.5rem 0;
+}
+
+.custom-calendar .rdrMonth {
+  color: #1f2937; /* Neutral dark color for text */
+}
+
+.custom-calendar .rdrDayNumber span {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.custom-calendar .rdrDayToday .rdrDayNumber span {
+  color: #2563EB; /* Custom blue for today's date */
+  font-weight: bold;
+}
+
+.custom-calendar .rdrDayHovered {
+  background-color: #e5e7eb;
+  color: #1f2937;
+}
+
+.custom-calendar .rdrSelected,
+.custom-calendar .rdrStartEdge,
+.custom-calendar .rdrEndEdge {
+  background-color: #2563EB;
+  color: #ffffff;
+  border-radius: 4px;
+}
+
+.custom-calendar .rdrDayDisabled {
+  color: #d1d5db;
+  text-decoration: line-through;
+}
+
+.custom-calendar .rdrNextPrevButton {
+  background-color: transparent;
+  border: none;
+  color: #6b7280;
+  font-size: 1.5rem;
+}

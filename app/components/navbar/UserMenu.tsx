@@ -8,6 +8,7 @@ import useLogInModal from "../../hooks/userLogInModel"; // Fixed import typo
 import { signOut } from "next-auth/react";
 import { SafeUser } from "@/app/types";
 import useRentModal from "../../hooks/useRentModal";
+import { useRouter } from "next/navigation";
 
 
 
@@ -20,6 +21,7 @@ export default function UserMenu({ currentUser }: UserMenuProps) {
   const logInModal = useLogInModal();
   const rentModal = useRentModal();
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   const toggleOpen = useCallback(() => {
     setIsOpen((prev) => !prev);
@@ -55,7 +57,7 @@ export default function UserMenu({ currentUser }: UserMenuProps) {
           <div className="flex flex-col cursor-pointer">
             {currentUser ? (
               <>
-                <MenuItem onClick={() => {}} label="My trips" />
+                <MenuItem onClick={() => router.push("/trips")} label="My trips" />
                 <MenuItem onClick={() => {}} label="Mina favoriter" />
                 <MenuItem onClick={() => {}} label="My reservations" />
                 <MenuItem onClick={() => {}} label="My properties" />

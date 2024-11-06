@@ -1,9 +1,10 @@
 "use client";
 
-import { SafeUser } from "@/app/types";
+import { Range as DateRangeType } from "react-date-range";
+import { SafeReservation, SafeUser } from "@/app/types";
 import { Listing, Reservation } from "@prisma/client";
 import Container from "@/app/components/Container";
-import { use, useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import ListingHead from "@/app/components/listings/listingHead";
 import ListingInfo from "@/app/components/listings/ListingInfo";
 import { categories } from "@/app/components/navbar/Categories";
@@ -11,12 +12,18 @@ import userLogInModal from "@/app/hooks/userLogInModel";
 import { useRouter } from "next/navigation";
 import { differenceInCalendarDays, eachDayOfInterval } from "date-fns";
 import toast from "react-hot-toast";
-import { useEffect } from "react";
+import ListingReservations from "@/app/components/listings/ListingReservations";
 
-const initialDates = { startDate: new Date(), endDate: new Date(), key: "selection" };
+const initialDates: DateRangeType[] = [
+  {
+    startDate: new Date(),
+    endDate: new Date(),
+    key: "selection",
+  },
+];
 
 interface ListingClientProps {
-  reservation?: Reservation[];
+  reservation?: SafeReservation[];
   listing: Listing;
   currentUser: SafeUser | null;
 }
@@ -43,7 +50,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalPrice, setTotalPrice] = useState(listing.price);
-  const [dates, setDates] = useState<{ startDate: Date; endDate: Date; key: string }>(initialDates);
+  const [dates, setDates] = useState<DateRangeType[]>(initialDates);
 
   const createReservation = useCallback(async () => {
     if (!currentUser) {
@@ -62,17 +69,14 @@ const ListingClient: React.FC<ListingClientProps> = ({
         body: JSON.stringify({
           totalPrice,
           listingId: listing.id,
-          checkIn: dates.startDate,
-          checkOut: dates.endDate,
+          checkIn: dates[0].startDate,
+          checkOut: dates[0].endDate,
         }),
       });
-
       if (!response.ok) throw new Error("Failed to create reservation.");
-
       toast.success("Reservation created successfully");
       setDates(initialDates);
-      // router.push("/reservations");
-      router.refresh();
+      router.push("/trips");
     } catch (error) {
       toast.error("An error occurred. Please try again.");
     } finally {
@@ -81,12 +85,14 @@ const ListingClient: React.FC<ListingClientProps> = ({
   }, [currentUser, totalPrice, listing.id, dates, logInModal, router]);
 
   useEffect(() => {
-    if (dates.startDate && dates.endDate) {
-      const days = differenceInCalendarDays(dates.endDate, dates.startDate);
+    if (dates[0].startDate && dates[0].endDate) {
+      const days = differenceInCalendarDays(
+        dates[0].endDate,
+        dates[0].startDate
+      );
       setTotalPrice(days * listing.price);
     }
-  }, [currentUser]);
-
+  }, [dates, listing.price]);
 
   const category = useMemo(() => {
     return categories.find((category) => category.label === listing.category);
@@ -113,56 +119,22 @@ const ListingClient: React.FC<ListingClientProps> = ({
               guestCount={listing.guestCount}
               locationValue={listing.address as string}
             />
-            <div className="md:col-span-3">
-              <div className="bg-white shadow-md rounded-lg p-6">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-semibold">Reserve your stay</h2>
-                  <span className="text-gray-500 text-sm">
-                    ${listing.price} x {differenceInCalendarDays(dates.endDate, dates.startDate)}{" "}
-                    nights
-                  </span>
-                </div>
-                <div className="mt-4">
-                  <input
-                    type="text"
-                    className="w-full border border-gray-300 rounded-lg p-3"
-                    placeholder="Check in"
-                    value={dates.startDate.toDateString()}
-                    readOnly
-                  />
-                </div>
-                <div className="mt-4">
-                  <input
-                    type="text"
-                    className="w-full border border-gray-300 rounded-lg p-3"
-                    placeholder="Check out"
-                    value={dates.endDate.toDateString()}
-                    readOnly
-                  />
-                </div>
-                <div className="mt-4">
-                  <input
-                    type="text"
-                    className="w-full border border-gray-300 rounded-lg p-3"
-                    placeholder="Total price"
-                    value={`$${totalPrice}`}
-                    readOnly
-                  />
-                </div>
-                <button
-                  className="mt-4 w-full bg-indigo-500 text-white p-3 rounded-lg"
-                  onClick={createReservation}
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Loading..." : "Reserve"}
-                </button>
-                </div>
-              </div>
+
+            <div className="order-first mb-10 md:order-last md:col-span-3">
+              <ListingReservations
+                price={listing.price}
+                totalPrice={totalPrice}
+                onChangeDate={(value) => setDates([value])} // Update to use alias
+                dateRange={dates} // Pass alias here
+                onSubmit={createReservation}
+                disabled={isLoading}
+                disabledDates={disabledDates}
+              />
+            </div>
           </div>
         </div>
       </div>
     </Container>
-    
   );
 };
 
