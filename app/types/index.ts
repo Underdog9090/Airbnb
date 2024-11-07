@@ -3,6 +3,7 @@ import { User, Listing, Reservation } from "@prisma/client";
 // Define SafeListing type with createAt
 export type SafeListing = Omit<Listing, "createAt"> & {
   createAt: string; // Convert createAt to a string
+  
 };
 
 // Define SafeReservation type with createAt, checkIn, checkOut, and listing as SafeListing
