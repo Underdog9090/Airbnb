@@ -36,9 +36,10 @@ const ReservationsClient: React.FC<ReservationsClientProps> = ({
 //     }
 //   };
 
-const onCancel = useCallback(async (id: string) => {
+const onCancel = useCallback(async (action: string, id: string) => {
+    console.log("Canceling reservation", id);
     try {
-      const response = await fetch(`/api/reservations/${id}`, { method: "DELETE" });
+      const response = await fetch(`/api/reservation/${id}`, { method: "DELETE" });
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to delete reservation");
@@ -51,6 +52,8 @@ const onCancel = useCallback(async (id: string) => {
       toast.error("Failed to cancel reservation");
     }
   }, [router]);
+  
+
   
 
   return (
