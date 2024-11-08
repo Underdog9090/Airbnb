@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { format } from "date-fns";
@@ -8,6 +8,7 @@ import HeartButton from "../HeartButton";
 import Button from "../Button";
 import useCountries from "@/app/hooks/useCountries";
 import { SafeListing, SafeReservation, SafeUser } from "@/app/types";
+import { on } from "events";
 
 interface ListingCardProps {
   data: SafeListing;
@@ -18,6 +19,7 @@ interface ListingCardProps {
   actionId?: string;
   currentUser?: SafeUser | null;
   onDelete?: (id: string) => void;  // Add an optional onDelete prop
+  onLike?: (id: string, isLiked: boolean) => void;  // Add an optional onLike prop
 }
 
 const ListingCard: React.FC<ListingCardProps> = ({
@@ -29,9 +31,22 @@ const ListingCard: React.FC<ListingCardProps> = ({
   actionId = "",
   currentUser,
   onDelete,  // Destructure the onDelete prop
+  onLike,  // Destructure the onLike prop
 }) => {
   const router = useRouter();
   const { getByValue } = useCountries();
+
+  const [isLiked, setIsLiked] = useState(false); // Assuming initially it's not liked
+
+  useEffect(() => {
+    if (!currentUser) {
+      return;
+    }
+
+    const isLiked = currentUser.favoriteIds?.includes(data.id);
+    setIsLiked(isLiked || false);
+  }, [currentUser, data.id]);
+
 
   const location =
     data.address && typeof data.address === "object"
@@ -77,7 +92,6 @@ const ListingCard: React.FC<ListingCardProps> = ({
     return `${format(start, "MMM dd yyyy")} - ${format(end, "MMM dd yyyy")}`;
   }, [reservation]);
 
-  const [isLiked, setIsLiked] = useState(false); // Assuming initially it's not liked
 
   // Handle like/unlike action
   const handleLikeClick = async () => {
@@ -91,8 +105,10 @@ const ListingCard: React.FC<ListingCardProps> = ({
     try {
       if (isLiked) {
         await fetch(`/api/favorites/${data.id}`, { method: "DELETE" });
+        onLike && onLike(data.id, false);  // Trigger onLike action passed from parent
       } else {
         await fetch(`/api/favorites/${data.id}`, { method: "POST" });
+        onLike && onLike(data.id, true);  // Trigger onLike action passed from parent
       }
       console.log("Toggled like for listing:", data.id);
     } catch (error) {
