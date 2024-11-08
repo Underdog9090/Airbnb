@@ -1,16 +1,24 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/app/libs/prismadb";
+import { SafeListing } from "../types";
 
-const prisma = new PrismaClient();
-
-export default async function getListings() {
+const getListings = async (filter?: { userId?: string }): Promise<SafeListing[]> => {
   try {
     const listings = await prisma.listing.findMany({
+      where: filter,
       orderBy: {
-        createAt: "desc", // Make sure the field in the model is 'createdAt'
+        createAt: "desc",
       },
     });
-    return listings;
-  } catch (error: any) {
-    throw new Error(error.message);
+
+    // Convert the raw listings to SafeListing format
+    return listings.map((listing) => ({
+      ...listing,
+      createAt: listing.createAt.toISOString(), // Convert Date to string (ISO format)
+    }));
+  } catch (error) {
+    console.error("Error fetching listings:", error);
+    throw new Error("Error fetching listings");
   }
-}
+};
+
+export default getListings;
