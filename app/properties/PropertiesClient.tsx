@@ -24,15 +24,25 @@ const PropertiesClient: React.FC<PropertiesClientProps> = ({
       const response = await fetch(`/api/listings/${id}`, {
         method: "DELETE",
       });
-      if (!response.ok) throw new Error(await response.text());
+  
+      if (!response.ok) {
+        const errorDetails = await response.text();
+        throw new Error(errorDetails || "Failed to delete property");
+      }
+  
       setDeletedPropertyId(id);
       toast.success("Property deleted successfully");
       router.refresh();
     } catch (error) {
       console.error("Error deleting property:", error);
-      toast.error("Failed to delete property");
+      if (error instanceof Error) {
+        toast.error(error.message || "Failed to delete property");
+      } else {
+        toast.error("Failed to delete property");
+      }
     }
   };
+  
 
   return (
     <Container>
